@@ -11,9 +11,7 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
   RoomBloc(String? url)
       : super(
           RoomState(
-            url: url != null && url.isNotEmpty
-                ? url.replaceAll('roomid', 'roomId')
-                : 'https://v3demo.mediasoup.org/?roomId=${randomAlpha(8).toLowerCase()}',
+            url: 'https://v3demo.mediasoup.org/?roomId=${url != null && url.isNotEmpty ? url : randomNumeric(6)}',
           ),
         );
 
@@ -26,8 +24,7 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
     }
   }
 
-  Stream<RoomState> _mapRoomSetActiveSpeakerIdToState(
-      RoomSetActiveSpeakerId event) async* {
+  Stream<RoomState> _mapRoomSetActiveSpeakerIdToState(RoomSetActiveSpeakerId event) async* {
     yield state.newActiveSpeaker(activeSpeakerId: event.speakerId);
   }
 }
