@@ -66,12 +66,10 @@ class PeerController {
           if (peer.video == null) {
             final renderer = peers[peer.id]?.renderer!;
             peers[peer.id] = peers[peer.id]!.removeAudioAndRenderer();
-            peers.value = peers;
             await Future.delayed(const Duration(microseconds: 300));
             await renderer?.dispose();
           } else {
             peers[peer.id] = peers[peer.id]!.removeAudio();
-            peers.value = peers;
           }
           await consumer?.close();
         } else if (peer.video?.id == consumerId) {
@@ -79,11 +77,9 @@ class PeerController {
           if (peer.audio != null) {
             peers[peer.id]!.renderer!.srcObject = peers[peer.id]!.audio!.stream;
             peers[peer.id] = peers[peer.id]!.removeVideo();
-            peers.value = peers;
           } else {
             final renderer = peers[peer.id]!.renderer!;
             peers[peer.id] = peers[peer.id]!.removeVideoAndRenderer();
-            peers.value = peers;
             await renderer.dispose();
           }
           await consumer?.close();
@@ -92,13 +88,11 @@ class PeerController {
         if (peer.audio?.id == consumerId) {
           final consumer = peer.audio;
           peers[peer.id] = peers[peer.id]!.removeAudio();
-          peers.value = peers;
           await consumer?.close();
         } else if (peer.video?.id == consumerId) {
           final consumer = peer.video;
           final renderer = peer.renderer;
           peers[peer.id] = peers[peer.id]!.removeVideoAndRenderer();
-          peers.value = peers;
           consumer
               ?.close()
               .then((_) => Future.delayed(const Duration(microseconds: 300)))
@@ -116,8 +110,6 @@ class PeerController {
       peers[peer.id] = peers[peer.id]!.copyWith(
         audio: peer.audio!.pauseCopy(),
       );
-
-      peers.value = peers;
     }
     peers.refresh();
   }
@@ -129,8 +121,6 @@ class PeerController {
       peers[peer.id] = peers[peer.id]!.copyWith(
         audio: peer.audio!.resumeCopy(),
       );
-
-      peers.value = peers;
     }
     peers.refresh();
   }

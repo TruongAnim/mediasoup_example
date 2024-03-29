@@ -12,7 +12,6 @@ class ListRemoteStreams extends GetView<PeerController> {
     return Obx(
       () {
         final Map<String, Peer> peers = controller.peers;
-
         final bool small = MediaQuery.of(context).size.width < 800;
         final bool horizontal = MediaQuery.of(context).orientation == Orientation.landscape;
 
