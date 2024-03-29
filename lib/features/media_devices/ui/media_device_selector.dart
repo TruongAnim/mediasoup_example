@@ -19,11 +19,10 @@ class MediaDeviceSelector extends StatelessWidget {
       isExpanded: true,
       value: selected,
       onChanged: onChanged,
-      items: options
-          .map<DropdownMenuItem<MediaDeviceInfo>>((device) {
+      items: options.map<DropdownMenuItem<MediaDeviceInfo>>((device) {
         return DropdownMenuItem<MediaDeviceInfo>(
-          child: Text(device.label, overflow: TextOverflow.fade,),
           value: device,
+          child: Text(device.label, overflow: TextOverflow.fade),
         );
       }).toList(),
     );

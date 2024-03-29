@@ -36,12 +36,12 @@ class MediaDevicesState extends Equatable {
     MediaDeviceInfo? selectedVideoInput,
   }) {
     return MediaDevicesState(
-      audioInputs: audioInputs != null ? audioInputs : List<MediaDeviceInfo>.of(this.audioInputs),
-      audioOutputs: audioOutputs != null ? audioOutputs : List<MediaDeviceInfo>.of(this.audioOutputs),
-      videoInputs: videoInputs != null ? videoInputs : List<MediaDeviceInfo>.of(this.videoInputs),
-      selectedAudioInput: selectedAudioInput != null ? selectedAudioInput : this.selectedAudioInput,
-      selectedAudioOutput: selectedAudioOutput != null ? selectedAudioOutput : this.selectedAudioOutput,
-      selectedVideoInput: selectedVideoInput != null ? selectedVideoInput : this.selectedVideoInput,
+      audioInputs: audioInputs ?? List<MediaDeviceInfo>.of(this.audioInputs),
+      audioOutputs: audioOutputs ?? List<MediaDeviceInfo>.of(this.audioOutputs),
+      videoInputs: videoInputs ?? List<MediaDeviceInfo>.of(this.videoInputs),
+      selectedAudioInput: selectedAudioInput ?? this.selectedAudioInput,
+      selectedAudioOutput: selectedAudioOutput ?? this.selectedAudioOutput,
+      selectedVideoInput: selectedVideoInput ?? this.selectedVideoInput,
     );
   }
 }

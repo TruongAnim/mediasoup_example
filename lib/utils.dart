@@ -1,6 +1,6 @@
 // Yoinked words from random_words package.
 // PS: I need null safety
-const List<String> nouns = const [
+const List<String> nouns = [
   'time',
   'year',
   'people',

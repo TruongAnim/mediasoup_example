@@ -15,7 +15,7 @@ class Microphone extends StatelessWidget {
     if (audioInputDevicesLength == 0) {
       return IconButton(
         onPressed: () {},
-        icon: Icon(
+        icon: const Icon(
           Icons.mic_off,
           color: Colors.grey,
         ),
@@ -23,14 +23,16 @@ class Microphone extends StatelessWidget {
     }
     return ElevatedButton(
       style: ButtonStyle(
-        shape: MaterialStateProperty.all(CircleBorder()),
-        padding: MaterialStateProperty.all(EdgeInsets.all(8)),
+        shape: MaterialStateProperty.all(const CircleBorder()),
+        padding: MaterialStateProperty.all(const EdgeInsets.all(8)),
         backgroundColor: MaterialStateProperty.all(Colors.white),
         overlayColor: MaterialStateProperty.resolveWith<Color?>((states) {
           if (states.contains(MaterialState.pressed)) return Colors.grey;
+          return null;
         }),
         shadowColor: MaterialStateProperty.resolveWith<Color?>((states) {
           if (states.contains(MaterialState.pressed)) return Colors.grey;
+          return null;
         }),
       ),
       onPressed: () {

@@ -3,12 +3,13 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:mediasoup_update/helper.dart';
 
 part 'media_devices_event.dart';
 part 'media_devices_state.dart';
 
 class MediaDevicesBloc extends Bloc<MediaDevicesEvent, MediaDevicesState> {
-  MediaDevicesBloc() : super(MediaDevicesState());
+  MediaDevicesBloc() : super(const MediaDevicesState());
 
   @override
   Stream<MediaDevicesState> mapEventToState(
@@ -43,17 +44,15 @@ class MediaDevicesBloc extends Bloc<MediaDevicesEvent, MediaDevicesState> {
     );
   }
 
-  Stream<MediaDevicesState> _mapLoadDevicesToState(
-      MediaDeviceLoadDevices event) async* {
+  Stream<MediaDevicesState> _mapLoadDevicesToState(MediaDeviceLoadDevices event) async* {
     try {
-      final List<MediaDeviceInfo> devices =
-          await navigator.mediaDevices.enumerateDevices();
+      final List<MediaDeviceInfo> devices = await navigator.mediaDevices.enumerateDevices();
 
       final List<MediaDeviceInfo> audioInputs = [];
       final List<MediaDeviceInfo> audioOutputs = [];
       final List<MediaDeviceInfo> videoInputs = [];
 
-      devices.forEach((device) {
+      for (var device in devices) {
         switch (device.kind) {
           case 'audioinput':
             audioInputs.add(device);
@@ -67,7 +66,7 @@ class MediaDevicesBloc extends Bloc<MediaDevicesEvent, MediaDevicesState> {
           default:
             break;
         }
-      });
+      }
       MediaDeviceInfo? selectedAudioInput;
       MediaDeviceInfo? selectedAudioOutput;
       MediaDeviceInfo? selectedVideoInput;
@@ -89,6 +88,8 @@ class MediaDevicesBloc extends Bloc<MediaDevicesEvent, MediaDevicesState> {
         selectedAudioOutput: selectedAudioOutput,
         selectedVideoInput: selectedVideoInput,
       );
-    } catch (e) {}
+    } catch (e) {
+      appPrint(e);
+    }
   }
 }

@@ -1,7 +1,6 @@
 import 'package:mediasoup_update/features/media_devices/bloc/media_devices_bloc.dart';
 import 'package:mediasoup_update/features/producers/bloc/producers_bloc.dart';
 import 'package:mediasoup_update/features/producers/ui/renderer/dragger.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -34,11 +33,25 @@ class _LocalStreamState extends State<LocalStream> {
       builder: (context, state) {
         final MediaDeviceInfo? selectedVideoInput =
             context.select((MediaDevicesBloc mediaDevicesBloc) => mediaDevicesBloc.state.selectedVideoInput);
-        if (renderer.srcObject != null && renderer.renderVideo)
+        if (renderer.srcObject != null && renderer.renderVideo) {
           return Dragger(
-            key: ValueKey('Dragger'),
+            key: const ValueKey('Dragger'),
+            child2: Container(
+              key: const ValueKey('RenderMe_View'),
+              width: streamContainerSize - 4,
+              height: streamContainerSize - 4,
+              margin: const EdgeInsets.all(2),
+              child: ClipOval(
+                child: RTCVideoView(
+                  renderer,
+                  objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                  mirror: selectedVideoInput != null && selectedVideoInput.label.contains('back') ? false : true,
+                  // mirror: true,
+                ),
+              ),
+            ),
             child: Container(
-              key: ValueKey('RenderMe_Border'),
+              key: const ValueKey('RenderMe_Border'),
               width: streamContainerSize,
               height: streamContainerSize,
               // margin: const EdgeInsets.only(left: 5, bottom: 10),
@@ -52,23 +65,10 @@ class _LocalStreamState extends State<LocalStream> {
                 ),
               ),
             ),
-            child2: Container(
-              key: ValueKey('RenderMe_View'),
-              width: streamContainerSize - 4,
-              height: streamContainerSize - 4,
-              margin: const EdgeInsets.all(2),
-              child: ClipOval(
-                child: RTCVideoView(
-                  renderer,
-                  objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-                  mirror: selectedVideoInput != null && selectedVideoInput.label.contains('back') ? false : true,
-                  // mirror: true,
-                ),
-              ),
-            ),
           );
+        }
 
-        return SizedBox.shrink();
+        return const SizedBox.shrink();
       },
     );
   }

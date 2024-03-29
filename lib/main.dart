@@ -26,16 +26,18 @@ class DevHttpOverrides extends HttpOverrides {
 }
 
 void main() {
-  HttpOverrides.global = new DevHttpOverrides();
+  HttpOverrides.global = DevHttpOverrides();
   runApp(
     MultiBlocProvider(
       providers: getAppModules(),
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -46,10 +48,10 @@ class MyApp extends StatelessWidget {
       onGenerateRoute: (settings) {
         if (settings.name == Welcome.RoutePath) {
           return MaterialPageRoute(
-            builder: (context) => Welcome(),
+            builder: (context) => const Welcome(),
           );
         }
-        if (settings.name == Room.RoutePath) {
+        if (settings.name == Room.routePath) {
           return MaterialPageRoute(
             builder: (context) => MultiBlocProvider(
                 providers: getRoomModules(settings: settings),
@@ -78,10 +80,11 @@ class MyApp extends StatelessWidget {
                       mediaDevicesBloc: context.read<MediaDevicesBloc>(),
                     )..join();
                   },
-                  child: Room(),
+                  child: const Room(),
                 )),
           );
         }
+        return null;
       },
     );
   }

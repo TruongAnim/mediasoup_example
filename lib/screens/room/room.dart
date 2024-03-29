@@ -1,5 +1,5 @@
-import 'package:mediasoup_update/features/media_devices/ui/AudioInputSelector.dart';
-import 'package:mediasoup_update/features/media_devices/ui/VideoInputSelector.dart';
+import 'package:mediasoup_update/features/media_devices/ui/audio_input_selector.dart';
+import 'package:mediasoup_update/features/media_devices/ui/video_input_selector.dart';
 import 'package:mediasoup_update/features/peers/ui/list_remote_streams.dart';
 import 'package:mediasoup_update/features/producers/ui/controls/audio_output.dart';
 import 'package:mediasoup_update/features/producers/ui/renderer/local_stream.dart';
@@ -11,7 +11,7 @@ import 'package:mediasoup_update/screens/room/ui/room_app_bar.dart';
 import 'package:expandable_bottom_sheet/expandable_bottom_sheet.dart';
 
 class Room extends StatefulWidget {
-  static const String RoutePath = '/room';
+  static const String routePath = '/room';
 
   const Room({Key? key}) : super(key: key);
 
@@ -50,7 +50,7 @@ class _RoomState extends State<Room> {
               maxWidth: 300,
               minWidth: 0,
             ),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               borderRadius: BorderRadius.vertical(top: Radius.circular(30.0)),
               color: Colors.white,
               boxShadow: [
@@ -70,12 +70,12 @@ class _RoomState extends State<Room> {
                   Container(
                     width: 30,
                     margin: const EdgeInsets.symmetric(vertical: 6),
-                    child: Divider(
+                    child: const Divider(
                       height: 2,
                       thickness: 2,
                     ),
                   ),
-                  Row(
+                  const Row(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -100,11 +100,11 @@ class _RoomState extends State<Room> {
                                 const Icon(Icons.mic),
                                 Text(
                                   'Audio Input',
-                                  style: Theme.of(context).textTheme.headline5,
+                                  style: Theme.of(context).textTheme.headlineSmall,
                                 ),
                               ],
                             ),
-                            AudioInputSelector(),
+                            const AudioInputSelector(),
                           ],
                         ),
                         Column(
@@ -114,11 +114,11 @@ class _RoomState extends State<Room> {
                                 const Icon(Icons.videocam),
                                 Text(
                                   'Video Input',
-                                  style: Theme.of(context).textTheme.headline5,
+                                  style: Theme.of(context).textTheme.headlineSmall,
                                 ),
                               ],
                             ),
-                            VideoInputSelector(),
+                            const VideoInputSelector(),
                           ],
                         ),
                         // Column(
@@ -145,7 +145,7 @@ class _RoomState extends State<Room> {
         ),
         background: GestureDetector(
           onTap: toggle,
-          child: Stack(
+          child: const Stack(
             fit: StackFit.expand,
             children: [
               ListRemoteStreams(),

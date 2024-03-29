@@ -13,7 +13,8 @@ class MeState extends Equatable {
     required this.webcamInProgress,
   });
 
-  static MeState copy(MeState old, {
+  static MeState copy(
+    MeState old, {
     String? displayName,
     String? id,
     bool? shareInProgress,
@@ -22,10 +23,10 @@ class MeState extends Equatable {
     return MeState(
       displayName: displayName ?? old.displayName,
       id: id ?? old.id,
-      shareInProgress: shareInProgress != null ? shareInProgress : old.shareInProgress,
-      webcamInProgress: webcamInProgress != null ? webcamInProgress : old.webcamInProgress,
+      shareInProgress: shareInProgress ?? old.shareInProgress,
+      webcamInProgress: webcamInProgress ?? old.webcamInProgress,
     );
-}
+  }
 
   @override
   List<Object> get props => [

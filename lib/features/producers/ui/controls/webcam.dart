@@ -17,7 +17,7 @@ class Webcam extends StatelessWidget {
     if (videoInputDevicesLength == 0) {
       return IconButton(
         onPressed: () {},
-        icon: Icon(
+        icon: const Icon(
           Icons.videocam,
           color: Colors.grey,
           // size: screenHeight * 0.045,
@@ -27,14 +27,16 @@ class Webcam extends StatelessWidget {
     if (webcam == null) {
       return ElevatedButton(
         style: ButtonStyle(
-          shape: MaterialStateProperty.all(CircleBorder()),
-          padding: MaterialStateProperty.all(EdgeInsets.all(8)),
+          shape: MaterialStateProperty.all(const CircleBorder()),
+          padding: MaterialStateProperty.all(const EdgeInsets.all(8)),
           backgroundColor: MaterialStateProperty.all(Colors.white),
           overlayColor: MaterialStateProperty.resolveWith<Color?>((states) {
             if (states.contains(MaterialState.pressed)) return Colors.grey;
+            return null;
           }),
           shadowColor: MaterialStateProperty.resolveWith<Color?>((states) {
             if (states.contains(MaterialState.pressed)) return Colors.grey;
+            return null;
           }),
         ),
         onPressed: () {
@@ -42,7 +44,7 @@ class Webcam extends StatelessWidget {
             context.read<RoomClientRepository>().enableWebcam();
           }
         },
-        child: Icon(
+        child: const Icon(
           Icons.videocam_off,
           color: Colors.black,
           // size: screenHeight * 0.045,
@@ -51,14 +53,16 @@ class Webcam extends StatelessWidget {
     }
     return ElevatedButton(
       style: ButtonStyle(
-        shape: MaterialStateProperty.all(CircleBorder()),
-        padding: MaterialStateProperty.all(EdgeInsets.all(8)),
+        shape: MaterialStateProperty.all(const CircleBorder()),
+        padding: MaterialStateProperty.all(const EdgeInsets.all(8)),
         backgroundColor: MaterialStateProperty.all(Colors.white),
         overlayColor: MaterialStateProperty.resolveWith<Color?>((states) {
           if (states.contains(MaterialState.pressed)) return Colors.grey;
+          return null;
         }),
         shadowColor: MaterialStateProperty.resolveWith<Color?>((states) {
           if (states.contains(MaterialState.pressed)) return Colors.grey;
+          return null;
         }),
       ),
       onPressed: () {
@@ -66,7 +70,7 @@ class Webcam extends StatelessWidget {
           context.read<RoomClientRepository>().disableWebcam();
         }
       },
-      child: Icon(
+      child: const Icon(
         Icons.videocam,
         color: Colors.black,
         // size: screenHeight * 0.045,

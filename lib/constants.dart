@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 
 class Constants {
   static final theme = ThemeData(
-    backgroundColor: Color(0xfffcfcff),
-    primaryColor: Color(0xfffcfcff),
-    scaffoldBackgroundColor: Color(0xfffcfcff),
-    appBarTheme: AppBarTheme(
+    primaryColor: const Color(0xfffcfcff),
+    scaffoldBackgroundColor: const Color(0xfffcfcff),
+    appBarTheme: const AppBarTheme(
       elevation: 0,
     ),
-    textSelectionTheme: TextSelectionThemeData(
+    textSelectionTheme: const TextSelectionThemeData(
       cursorColor: Colors.orangeAccent,
     ),
   );

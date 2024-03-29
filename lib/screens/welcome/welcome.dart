@@ -1,6 +1,6 @@
-import 'package:mediasoup_update/features/media_devices/ui/AudioInputSelector.dart';
-import 'package:mediasoup_update/features/media_devices/ui/AudioOutputSelector.dart';
-import 'package:mediasoup_update/features/media_devices/ui/VideoInputSelector.dart';
+import 'package:mediasoup_update/features/media_devices/ui/audio_input_selector.dart';
+import 'package:mediasoup_update/features/media_devices/ui/audio_output_selector.dart';
+import 'package:mediasoup_update/features/media_devices/ui/video_input_selector.dart';
 import 'package:flutter/material.dart';
 
 class Welcome extends StatefulWidget {
@@ -31,7 +31,7 @@ class _WelcomeState extends State<Welcome> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'mediasoup-client-flutter',
           style: TextStyle(color: Colors.black),
         ),
@@ -47,14 +47,14 @@ class _WelcomeState extends State<Welcome> {
           child: Column(
             children: [
               Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.all(
                     Radius.circular(10.0),
                   ),
                 ),
                 child: TextField(
-                  style: TextStyle(
+                  style: const TextStyle(
                     // fontSize: 15.0,
                     color: Colors.black,
                   ),
@@ -62,14 +62,14 @@ class _WelcomeState extends State<Welcome> {
                     contentPadding: const EdgeInsets.only(left: 10),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         color: Colors.black,
                         width: 1,
                         style: BorderStyle.solid,
                       ),
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         color: Colors.black,
                         width: 1,
                         style: BorderStyle.solid,
@@ -83,7 +83,7 @@ class _WelcomeState extends State<Welcome> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         color: Colors.black,
                         width: 1,
                         style: BorderStyle.solid,
@@ -91,7 +91,7 @@ class _WelcomeState extends State<Welcome> {
                     ),
                     suffixIcon: url.isNotEmpty
                         ? GestureDetector(
-                            child: Icon(
+                            child: const Icon(
                               Icons.close,
                               color: Colors.black,
                             ),
@@ -121,8 +121,8 @@ class _WelcomeState extends State<Welcome> {
                     arguments: url,
                   );
                 },
-                child: Text(url.isNotEmpty ? 'Join' : 'Join to Random Room'),
                 style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.black)),
+                child: Text(url.isNotEmpty ? 'Join' : 'Join to Random Room'),
               ),
               Column(
                 children: [
@@ -131,11 +131,11 @@ class _WelcomeState extends State<Welcome> {
                       const Icon(Icons.mic),
                       Text(
                         'Audio Input',
-                        style: Theme.of(context).textTheme.headline5,
+                        style: Theme.of(context).textTheme.headlineSmall,
                       ),
                     ],
                   ),
-                  AudioInputSelector(),
+                  const AudioInputSelector(),
                 ],
               ),
               Column(
@@ -145,11 +145,11 @@ class _WelcomeState extends State<Welcome> {
                       const Icon(Icons.videocam),
                       Text(
                         'Video Input',
-                        style: Theme.of(context).textTheme.headline5,
+                        style: Theme.of(context).textTheme.headlineSmall,
                       ),
                     ],
                   ),
-                  VideoInputSelector(),
+                  const VideoInputSelector(),
                 ],
               ),
               Column(
@@ -159,11 +159,11 @@ class _WelcomeState extends State<Welcome> {
                       const Icon(Icons.videocam),
                       Text(
                         'Audio Output',
-                        style: Theme.of(context).textTheme.headline5,
+                        style: Theme.of(context).textTheme.headlineSmall,
                       ),
                     ],
                   ),
-                  AudioOutputSelector(),
+                  const AudioOutputSelector(),
                 ],
               ),
             ],

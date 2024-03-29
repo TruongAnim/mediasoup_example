@@ -11,9 +11,11 @@ class Dragger extends StatefulWidget {
 }
 
 class _Dragger extends State<Dragger> {
-  Offset position = Offset(10, 100);
+  Offset position = const Offset(10, 100);
 
-  void setOffset(DragUpdateDetails details) => setState(() { position = details.globalPosition + Offset(-90, -90); });
+  void setOffset(DragUpdateDetails details) => setState(() {
+        position = details.globalPosition + const Offset(-90, -90);
+      });
 
   @override
   Widget build(BuildContext context) {

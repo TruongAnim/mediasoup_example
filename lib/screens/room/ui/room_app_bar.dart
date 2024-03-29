@@ -14,7 +14,7 @@ class RoomAppBar extends StatelessWidget implements PreferredSizeWidget {
       preferredSize: const Size.fromHeight(56),
       child: Container(
         margin: const EdgeInsets.only(left: 20, right: 20),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           borderRadius: BorderRadius.vertical(top: Radius.circular(30.0)),
         ),
         child: AnimatedOpacity(
@@ -23,7 +23,7 @@ class RoomAppBar extends StatelessWidget implements PreferredSizeWidget {
           child: AppBar(
             elevation: 5,
             backgroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
+            shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(
                 bottom: Radius.circular(30),
               ),
@@ -33,7 +33,7 @@ class RoomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 String url = context.select((RoomBloc bloc) => bloc.state.url);
                 return Text(
                   'Room id: ${Uri.parse(url).queryParameters['roomId'] ?? Uri.parse(url).queryParameters['roomid']}',
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.black,
                   ),
                 );
@@ -45,20 +45,20 @@ class RoomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   String url = context.read<RoomBloc>().state.url;
                   Clipboard.setData(ClipboardData(text: url));
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: const Text('Room link copied to clipboard'),
-                      duration: const Duration(seconds: 1),
+                    const SnackBar(
+                      content: Text('Room link copied to clipboard'),
+                      duration: Duration(seconds: 1),
                     ),
                   );
                 },
-                icon: Icon(
+                icon: const Icon(
                   Icons.copy,
                   color: Colors.black,
                 ),
               ),
             ],
             leading: IconButton(
-              icon: Icon(
+              icon: const Icon(
                 Icons.arrow_back,
                 color: Colors.black,
               ),

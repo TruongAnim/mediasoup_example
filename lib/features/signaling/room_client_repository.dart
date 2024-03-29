@@ -1,3 +1,5 @@
+// ignore_for_file: empty_catches
+
 import 'dart:async';
 
 import 'package:mediasoup_update/features/me/bloc/me_bloc.dart';
@@ -7,8 +9,8 @@ import 'package:mediasoup_update/features/producers/bloc/producers_bloc.dart';
 import 'package:mediasoup_update/features/room/bloc/room_bloc.dart';
 import 'package:mediasoup_update/features/signaling/web_socket.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:mediasoup_client_flutter/mediasoup_client_flutter.dart';
+import 'package:mediasoup_update/helper.dart';
 
 class RoomClientRepository {
   final ProducersBloc producersBloc;
@@ -22,14 +24,14 @@ class RoomClientRepository {
   final String url;
   final String displayName;
 
-  bool _closed = false;
+  final bool _closed = false;
 
   WebSocket? _webSocket;
   Device? _mediasoupDevice;
   Transport? _sendTransport;
   Transport? _recvTransport;
   bool _produce = false;
-  bool _consume = true;
+  final bool _consume = true;
   StreamSubscription<MediaDevicesState>? _mediaDevicesBlocSubscription;
   String? audioInputDeviceId;
   String? audioOutputDeviceId;
@@ -73,7 +75,7 @@ class RoomClientRepository {
   Future<void> disableMic() async {
     String micId = producersBloc.state.mic!.id;
 
-    producersBloc.add(ProducerRemove(source: 'mic'));
+    producersBloc.add(const ProducerRemove(source: 'mic'));
 
     try {
       await _webSocket!.socket.request('closeProducer', {
@@ -83,23 +85,22 @@ class RoomClientRepository {
   }
 
   Future<void> disableWebcam() async {
-    meBloc.add(MeSetWebcamInProgress(progress: true));
+    meBloc.add(const MeSetWebcamInProgress(progress: true));
     String webcamId = producersBloc.state.webcam!.id;
 
-    producersBloc.add(ProducerRemove(source: 'webcam'));
+    producersBloc.add(const ProducerRemove(source: 'webcam'));
 
     try {
       await _webSocket!.socket.request('closeProducer', {
         'producerId': webcamId,
       });
-    } catch (error) {
     } finally {
-      meBloc.add(MeSetWebcamInProgress(progress: false));
+      meBloc.add(const MeSetWebcamInProgress(progress: false));
     }
   }
 
   Future<void> muteMic() async {
-    producersBloc.add(ProducerPaused(source: 'mic'));
+    producersBloc.add(const ProducerPaused(source: 'mic'));
 
     try {
       await _webSocket!.socket.request('pauseProducer', {
@@ -109,7 +110,7 @@ class RoomClientRepository {
   }
 
   Future<void> unmuteMic() async {
-    producersBloc.add(ProducerResumed(source: 'mic'));
+    producersBloc.add(const ProducerResumed(source: 'mic'));
 
     try {
       await _webSocket!.socket.request('resumeProducer', {
@@ -120,7 +121,7 @@ class RoomClientRepository {
 
   void _producerCallback(Producer producer) {
     if (producer.source == 'webcam') {
-      meBloc.add(MeSetWebcamInProgress(progress: false));
+      meBloc.add(const MeSetWebcamInProgress(progress: false));
     }
     producer.on('trackended', () {
       disableMic().catchError((data) {});
@@ -180,7 +181,7 @@ class RoomClientRepository {
     if (meBloc.state.webcamInProgress) {
       return;
     }
-    meBloc.add(MeSetWebcamInProgress(progress: true));
+    meBloc.add(const MeSetWebcamInProgress(progress: true));
     if (_mediasoupDevice!.canProduce(RTCRtpMediaType.RTCRtpMediaTypeVideo) == false) {
       return;
     }
@@ -188,13 +189,13 @@ class RoomClientRepository {
     MediaStreamTrack? track;
     try {
       // NOTE: prefer using h264
-      final videoVPVersion = kIsWeb ? 9 : 8;
+      const videoVPVersion = kIsWeb ? 9 : 8;
       RtpCodecCapability? codec = _mediasoupDevice!.rtpCapabilities.codecs.firstWhere(
           (RtpCodecCapability c) => c.mimeType.toLowerCase() == 'video/vp$videoVPVersion',
           orElse: () => throw 'desired vp$videoVPVersion codec+configuration is not supported');
       videoStream = await createVideoStream();
       track = videoStream.getVideoTracks().first;
-      meBloc.add(MeSetWebcamInProgress(progress: true));
+      meBloc.add(const MeSetWebcamInProgress(progress: true));
       _sendTransport!.produce(
         track: track,
         codecOptions: ProducerCodecOptions(
@@ -251,7 +252,7 @@ class RoomClientRepository {
 
       dynamic routerRtpCapabilities = await _webSocket!.socket.request('getRouterRtpCapabilities', {});
 
-      print(routerRtpCapabilities);
+      appPrint(routerRtpCapabilities);
 
       final rtpCapabilities = RtpCapabilities.fromMap(routerRtpCapabilities);
       rtpCapabilities.headerExtensions.removeWhere((he) => he.uri == 'urn:3gpp:video-orientation');
@@ -380,7 +381,7 @@ class RoomClientRepository {
         });
       }
     } catch (error) {
-      print(error);
+      appPrint(error);
       close();
     }
   }
@@ -394,7 +395,7 @@ class RoomClientRepository {
 
     _webSocket!.onOpen = _joinRoom;
     _webSocket!.onFail = () {
-      print('WebSocket connection failed');
+      appPrint('WebSocket connection failed');
     };
     _webSocket!.onDisconnected = () {
       if (_sendTransport != null) {
@@ -431,8 +432,8 @@ class RoomClientRepository {
                 accept: accept,
               );
             } catch (error) {
-              print('newConsumer request failed: $error');
-              throw (error);
+              appPrint('newConsumer request failed: $error');
+              rethrow;
             }
             break;
           }

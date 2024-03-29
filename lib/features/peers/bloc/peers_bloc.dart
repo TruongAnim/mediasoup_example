@@ -6,7 +6,6 @@ import 'package:equatable/equatable.dart';
 import 'package:mediasoup_update/features/peers/enitity/peer.dart';
 import 'package:mediasoup_update/features/media_devices/bloc/media_devices_bloc.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:mediasoup_client_flutter/mediasoup_client_flutter.dart';
 
 part 'peers_event.dart';
@@ -15,7 +14,7 @@ part 'peers_state.dart';
 class PeersBloc extends Bloc<dynamic, PeersState> {
   final MediaDevicesBloc mediaDevicesBloc;
   String selectedOutputId = '';
-  PeersBloc({required this.mediaDevicesBloc}) : super(PeersState()) {
+  PeersBloc({required this.mediaDevicesBloc}) : super(const PeersState()) {
     // if (mediaDevicesBloc.state.selectedAudioOutput?.deviceId != null) {
     //   selectedOutputId = mediaDevicesBloc.state.selectedAudioOutput!.deviceId;
     // }
@@ -117,7 +116,7 @@ class PeersBloc extends Bloc<dynamic, PeersState> {
             final renderer = newPeers[peer.id]?.renderer!;
             newPeers[peer.id] = newPeers[peer.id]!.removeAudioAndRenderer();
             yield PeersState(peers: newPeers);
-            await Future.delayed(Duration(microseconds: 300));
+            await Future.delayed(const Duration(microseconds: 300));
             await renderer?.dispose();
           } else {
             newPeers[peer.id] = newPeers[peer.id]!.removeAudio();
@@ -151,7 +150,7 @@ class PeersBloc extends Bloc<dynamic, PeersState> {
           yield PeersState(peers: newPeers);
           consumer
               ?.close()
-              .then((_) => Future.delayed(Duration(microseconds: 300)))
+              .then((_) => Future.delayed(const Duration(microseconds: 300)))
               .then((_) async => await renderer?.dispose());
         }
       }
@@ -186,9 +185,9 @@ class PeersBloc extends Bloc<dynamic, PeersState> {
 
   @override
   Future<void> close() {
-    state.peers.values.forEach((peer) {
+    for (var peer in state.peers.values) {
       peer.renderer?.dispose();
-    });
+    }
     return super.close();
   }
 }

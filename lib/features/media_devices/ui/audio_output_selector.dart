@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mediasoup_update/features/media_devices/ui/MediaDeviceSelector.dart';
+import 'package:mediasoup_update/features/media_devices/ui/media_device_selector.dart';
 import 'package:mediasoup_update/features/media_devices/bloc/media_devices_bloc.dart';
 
 class AudioOutputSelector extends StatelessWidget {

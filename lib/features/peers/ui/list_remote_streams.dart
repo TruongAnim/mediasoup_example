@@ -24,13 +24,14 @@ class ListRemoteStreams extends StatelessWidget {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
 
-    if (small && horizontal)
+    if (small && horizontal) {
       return MediaQuery.removePadding(
         context: context,
+        removeTop: true,
         child: GridView.count(
           crossAxisCount: 2,
           children: peers.values.map((peer) {
-            return Container(
+            return SizedBox(
               key: ValueKey('${peer.id}_container'),
               width: width / 2,
               height: peers.length <= 2 ? height : height / 2,
@@ -41,16 +42,17 @@ class ListRemoteStreams extends StatelessWidget {
             );
           }).toList(),
         ),
-        removeTop: true,
       );
+    }
 
-    if (small)
+    if (small) {
       return MediaQuery.removePadding(
         context: context,
+        removeTop: true,
         child: ListView.builder(
           itemBuilder: (context, index) {
             final peerId = peers.keys.elementAt(index);
-            return Container(
+            return SizedBox(
               key: ValueKey('${peerId}_container'),
               width: double.infinity,
               height: peers.length > 2 ? height / 3 : height / 2,
@@ -64,15 +66,15 @@ class ListRemoteStreams extends StatelessWidget {
           scrollDirection: Axis.vertical,
           shrinkWrap: true,
         ),
-        removeTop: true,
       );
+    }
 
     return Center(
       child: Wrap(
         spacing: 10,
         children: [
           for (Peer peer in peers.values)
-            Container(
+            SizedBox(
               key: ValueKey('${peer.id}_container'),
               width: 450,
               height: 380,
