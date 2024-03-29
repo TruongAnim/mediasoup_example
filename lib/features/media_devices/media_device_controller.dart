@@ -4,17 +4,23 @@ import 'package:get/get.dart';
 import 'package:mediasoup_update/helper.dart';
 
 class MediaDeviceController extends GetxController {
-  RxList<MediaDeviceInfo> audioInputs = RxList();
-  RxList<MediaDeviceInfo> audioOutputs = RxList();
-  RxList<MediaDeviceInfo> videoInputs = RxList();
-  Rxn<MediaDeviceInfo> selectedAudioInput = Rxn<MediaDeviceInfo>();
-  Rxn<MediaDeviceInfo> selectedAudioOutput = Rxn<MediaDeviceInfo>();
-  Rxn<MediaDeviceInfo> selectedVideoInput = Rxn<MediaDeviceInfo>();
+  final RTCVideoRenderer renderer = RTCVideoRenderer();
+  final RxList<MediaDeviceInfo> audioInputs = RxList();
+  final RxList<MediaDeviceInfo> audioOutputs = RxList();
+  final RxList<MediaDeviceInfo> videoInputs = RxList();
+  final Rxn<MediaDeviceInfo> selectedAudioInput = Rxn<MediaDeviceInfo>();
+  final Rxn<MediaDeviceInfo> selectedAudioOutput = Rxn<MediaDeviceInfo>();
+  final Rxn<MediaDeviceInfo> selectedVideoInput = Rxn<MediaDeviceInfo>();
 
   @override
   void onInit() {
     super.onInit();
+    _initRenderers();
     _initMediaDevice();
+  }
+
+  _initRenderers() async {
+    await renderer.initialize();
   }
 
   _initMediaDevice() async {

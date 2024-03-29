@@ -1,33 +1,24 @@
 import 'package:get/get.dart';
+import 'package:mediasoup_client_flutter/mediasoup_client_flutter.dart';
 import 'package:mediasoup_update/features/media_devices/media_device_controller.dart';
 import 'package:mediasoup_update/features/producers/producer_controller.dart';
 import 'package:mediasoup_update/features/producers/ui/renderer/dragger.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart';
 
-class LocalStream extends StatefulWidget {
+class LocalStream extends GetView<MediaDeviceController> {
   const LocalStream({Key? key}) : super(key: key);
-
-  @override
-  _LocalStreamState createState() => _LocalStreamState();
-}
-
-class _LocalStreamState extends State<LocalStream> {
-  late RTCVideoRenderer renderer;
   final double streamContainerSize = 180;
 
   @override
-  void initState() {
-    super.initState();
-    initRenderers();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return GetBuilder<ProducerController>(
-      builder: (context) {
-        final MediaDeviceInfo? selectedVideoInput = Get.find<MediaDeviceController>().selectedVideoInput.value;
-        if (renderer.srcObject != null && renderer.renderVideo) {
+    return Obx(
+      () {
+        final MediaDeviceInfo? selectedVideoInput = controller.selectedVideoInput.value;
+        final Producer? webcam = Get.find<ProducerController>().webcam.value;
+        if (controller.renderer.srcObject != webcam?.stream) {
+          controller.renderer.srcObject = webcam?.stream;
+        }
+        if (controller.renderer.srcObject != null && controller.renderer.renderVideo) {
           return Dragger(
             key: const ValueKey('Dragger'),
             child2: Container(
@@ -37,7 +28,7 @@ class _LocalStreamState extends State<LocalStream> {
               margin: const EdgeInsets.all(2),
               child: ClipOval(
                 child: RTCVideoView(
-                  renderer,
+                  controller.renderer,
                   objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                   mirror: selectedVideoInput != null && selectedVideoInput.label.contains('back') ? false : true,
                   // mirror: true,
@@ -65,16 +56,5 @@ class _LocalStreamState extends State<LocalStream> {
         return const SizedBox.shrink();
       },
     );
-  }
-
-  void initRenderers() async {
-    renderer = RTCVideoRenderer();
-    await renderer.initialize();
-  }
-
-  @override
-  void dispose() {
-    renderer.dispose();
-    super.dispose();
   }
 }

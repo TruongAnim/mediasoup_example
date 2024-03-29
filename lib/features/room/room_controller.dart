@@ -12,11 +12,16 @@ class RoomController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    final url = Get.arguments;
-    this.url.value = url != null && url.isNotEmpty
-        ? url.replaceAll('roomid', 'roomId')
-        : 'https://v3demo.mediasoup.org/?roomId=${randomAlpha(8).toLowerCase()}';
+    final arg = Get.arguments;
+    final id = arg != null && arg.isNotEmpty ? arg : randomNumeric(6).toLowerCase();
+    url.value = 'https://v3demo.mediasoup.org/?roomId=$id';
     _initRepo();
+  }
+
+  @override
+  void onClose() {
+    super.onClose();
+    GetIt.I.unregister<RoomClientRepo>();
   }
 
   void _initRepo() {
