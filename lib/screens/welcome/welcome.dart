@@ -1,11 +1,11 @@
+import 'package:get/get.dart';
+import 'package:mediasoup_update/config/routes/route_path/base_routers.dart';
 import 'package:mediasoup_update/features/media_devices/ui/audio_input_selector.dart';
 import 'package:mediasoup_update/features/media_devices/ui/audio_output_selector.dart';
 import 'package:mediasoup_update/features/media_devices/ui/video_input_selector.dart';
 import 'package:flutter/material.dart';
 
 class Welcome extends StatefulWidget {
-  static const String RoutePath = '/';
-
   const Welcome({Key? key}) : super(key: key);
 
   @override
@@ -115,9 +115,8 @@ class _WelcomeState extends State<Welcome> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(
-                    context,
-                    '/room',
+                  Get.toNamed(
+                    BaseRouters.ROOM,
                     arguments: url,
                   );
                 },

@@ -1,8 +1,9 @@
-import 'package:mediasoup_update/features/signaling/room_client_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mediasoup_update/features/room/bloc/room_bloc.dart';
+import 'package:get/get.dart';
+import 'package:get_it/get_it.dart';
+import 'package:mediasoup_update/features/room/room_controller.dart';
+import 'package:mediasoup_update/features/signaling/room_client_repo.dart';
 
 class RoomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool display;
@@ -30,7 +31,7 @@ class RoomAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
             title: Builder(
               builder: (context) {
-                String url = context.select((RoomBloc bloc) => bloc.state.url);
+                String url = Get.find<RoomController>().url.value;
                 return Text(
                   'Room id: ${Uri.parse(url).queryParameters['roomId'] ?? Uri.parse(url).queryParameters['roomid']}',
                   style: const TextStyle(
@@ -42,7 +43,7 @@ class RoomAppBar extends StatelessWidget implements PreferredSizeWidget {
             actions: [
               IconButton(
                 onPressed: () {
-                  String url = context.read<RoomBloc>().state.url;
+                  String url = Get.find<RoomController>().url.value;
                   Clipboard.setData(ClipboardData(text: url));
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -63,7 +64,7 @@ class RoomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 color: Colors.black,
               ),
               onPressed: () {
-                context.read<RoomClientRepository>().close();
+                GetIt.I.get<RoomClientRepo>().close();
                 Navigator.pop(context);
               },
             ),

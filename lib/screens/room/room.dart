@@ -11,8 +11,6 @@ import 'package:mediasoup_update/screens/room/ui/room_app_bar.dart';
 import 'package:expandable_bottom_sheet/expandable_bottom_sheet.dart';
 
 class Room extends StatefulWidget {
-  static const String routePath = '/room';
-
   const Room({Key? key}) : super(key: key);
 
   @override

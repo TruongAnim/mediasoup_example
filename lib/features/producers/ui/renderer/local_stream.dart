@@ -1,8 +1,8 @@
-import 'package:mediasoup_update/features/media_devices/bloc/media_devices_bloc.dart';
-import 'package:mediasoup_update/features/producers/bloc/producers_bloc.dart';
+import 'package:get/get.dart';
+import 'package:mediasoup_update/features/media_devices/media_device_controller.dart';
+import 'package:mediasoup_update/features/producers/producer_controller.dart';
 import 'package:mediasoup_update/features/producers/ui/renderer/dragger.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 class LocalStream extends StatefulWidget {
@@ -24,15 +24,9 @@ class _LocalStreamState extends State<LocalStream> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<ProducersBloc, ProducersState>(
-      listener: (context, state) {
-        if (renderer.srcObject != state.webcam?.stream) {
-          renderer.srcObject = state.webcam?.stream;
-        }
-      },
-      builder: (context, state) {
-        final MediaDeviceInfo? selectedVideoInput =
-            context.select((MediaDevicesBloc mediaDevicesBloc) => mediaDevicesBloc.state.selectedVideoInput);
+    return GetBuilder<ProducerController>(
+      builder: (context) {
+        final MediaDeviceInfo? selectedVideoInput = Get.find<MediaDeviceController>().selectedVideoInput.value;
         if (renderer.srcObject != null && renderer.renderVideo) {
           return Dragger(
             key: const ValueKey('Dragger'),

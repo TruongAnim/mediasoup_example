@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mediasoup_update/features/signaling/room_client_repository.dart';
+import 'package:get_it/get_it.dart';
+import 'package:mediasoup_update/features/signaling/room_client_repo.dart';
 
 class Leave extends StatelessWidget {
   const Leave({Key? key}) : super(key: key);
@@ -22,7 +22,7 @@ class Leave extends StatelessWidget {
         }),
       ),
       onPressed: () {
-        context.read<RoomClientRepository>().close();
+        GetIt.I.get<RoomClientRepo>().close();
         Navigator.pop(context);
       },
       child: const Icon(
