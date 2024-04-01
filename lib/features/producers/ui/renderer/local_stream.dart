@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 import 'package:mediasoup_client_flutter/mediasoup_client_flutter.dart';
+import 'package:mediasoup_update/core/mediasoup/device_controller.dart';
+import 'package:mediasoup_update/core/mediasoup/producer_controller.dart';
 import 'package:mediasoup_update/features/producers/ui/renderer/dragger.dart';
 import 'package:flutter/material.dart';
 import 'package:mediasoup_update/core/mediasoup/calling_controller.dart';
@@ -12,8 +14,8 @@ class LocalStream extends GetView<CallingController> {
   Widget build(BuildContext context) {
     return Obx(
       () {
-        final MediaDeviceInfo? selectedVideoInput = controller.selectedVideoInput.value;
-        final Producer? webcam = controller.webcam.value;
+        final MediaDeviceInfo? selectedVideoInput = Get.find<DeviceController>().selectedVideoInput.value;
+        final Producer? webcam = Get.find<ProducerController>().webcam.value;
         if (controller.renderer.srcObject != webcam?.stream) {
           controller.renderer.srcObject = webcam?.stream;
         }

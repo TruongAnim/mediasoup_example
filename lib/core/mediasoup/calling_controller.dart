@@ -1,350 +1,75 @@
-// ignore_for_file: empty_catches
-
 import 'dart:async';
-import 'dart:math';
 
-import 'package:collection/collection.dart';
 import 'package:get/get.dart' hide navigator;
-import 'package:mediasoup_update/features/peers/enitity/peer.dart';
 import 'package:mediasoup_update/features/signaling/web_socket.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:mediasoup_client_flutter/mediasoup_client_flutter.dart';
 import 'package:mediasoup_update/helper.dart';
-import 'package:mediasoup_update/utils.dart';
-import 'package:random_string/random_string.dart';
+
+import 'call_info_controller.dart';
+import 'device_controller.dart';
+import 'peer_controller.dart';
+import 'producer_controller.dart';
 
 class CallingController extends GetxController {
-  String roomId = '';
-  String peerId = '';
-  String url = '';
-  String displayName = '';
+  late DeviceController _deviceController;
+  late ProducerController _producerController;
+  late PeerController _peerController;
+  late CallInfoController _callInfoController;
 
-  final bool _closed = false;
-
-  WebSocket? _webSocket;
   Device? _mediasoupDevice;
+  WebSocket? _webSocket;
   Transport? _sendTransport;
   Transport? _recvTransport;
   bool _produce = false;
+  final bool _closed = false;
   final bool _consume = true;
-  StreamSubscription<MediaDeviceInfo?>? _audioInputSubscription;
-  StreamSubscription<MediaDeviceInfo?>? _videoInputSubscription;
-  String? audioInputDeviceId;
-  String? audioOutputDeviceId;
-  String? videoInputDeviceId;
 
-  CallingController();
-
-  // Name
-  RxString rxDisplayName = RxString('');
-  RxString rxId = RxString('');
-  RxBool shareInProgress = RxBool(false);
+  // Is loading webcam
   RxBool webcamInProgress = RxBool(false);
 
-  // Device
+  // Renderer
   final RTCVideoRenderer renderer = RTCVideoRenderer();
-  final RxList<MediaDeviceInfo> audioInputs = RxList();
-  final RxList<MediaDeviceInfo> audioOutputs = RxList();
-  final RxList<MediaDeviceInfo> videoInputs = RxList();
-  final Rxn<MediaDeviceInfo> selectedAudioInput = Rxn<MediaDeviceInfo>();
-  final Rxn<MediaDeviceInfo> selectedAudioOutput = Rxn<MediaDeviceInfo>();
-  final Rxn<MediaDeviceInfo> selectedVideoInput = Rxn<MediaDeviceInfo>();
-
-  // Peer
-  RxString selectedOutputId = RxString('');
-  RxMap<String, Peer> peers = RxMap<String, Peer>({});
-
-  // Producer
-  Rxn<Producer> mic = Rxn();
-  Rxn<Producer> webcam = Rxn();
-  Rxn<Producer> screen = Rxn();
-
-  // Room
-  RxnString activeSpeakerId = RxnString();
-  RxnString state = RxnString();
-  RxString rxUrl = RxString('');
 
   @override
   void onInit() {
     super.onInit();
-    _initRoom();
-    _initName();
     _initRenderers();
-
-    _initMediaDevice();
+    _initController();
+    _setup();
   }
 
   @override
   void onClose() {
     super.onClose();
+    close();
   }
 
-  // Name
-  void _initName() {
-    rxId.value = randomAlpha(8);
-    rxDisplayName.value = nouns[Random.secure().nextInt(2500)];
+  void _initController() {
+    _deviceController = Get.put<DeviceController>(DeviceController());
+    _producerController = Get.put<ProducerController>(ProducerController());
+    _peerController = Get.put<PeerController>(PeerController());
+    _callInfoController = Get.put<CallInfoController>(CallInfoController());
   }
 
-  void setWebcamInProgress({required bool progress}) {
-    webcamInProgress.value = progress;
-  }
-
-  // Device
   _initRenderers() async {
     await renderer.initialize();
   }
 
-  _initMediaDevice() async {
-    try {
-      final List<MediaDeviceInfo> devices = await navigator.mediaDevices.enumerateDevices();
-
-      final List<MediaDeviceInfo> audioInputs = [];
-      final List<MediaDeviceInfo> audioOutputs = [];
-      final List<MediaDeviceInfo> videoInputs = [];
-
-      for (var device in devices) {
-        switch (device.kind) {
-          case 'audioinput':
-            audioInputs.add(device);
-            break;
-          case 'audiooutput':
-            audioOutputs.add(device);
-            break;
-          case 'videoinput':
-            videoInputs.add(device);
-            break;
-          default:
-            break;
-        }
-      }
-      MediaDeviceInfo? selectedAudioInput;
-      MediaDeviceInfo? selectedAudioOutput;
-      MediaDeviceInfo? selectedVideoInput;
-      if (audioInputs.isNotEmpty) {
-        selectedAudioInput = audioInputs.first;
-      }
-      if (audioOutputs.isNotEmpty) {
-        selectedAudioOutput = audioOutputs.first;
-      }
-      if (videoInputs.isNotEmpty) {
-        selectedVideoInput = videoInputs.first;
-      }
-
-      this.audioInputs.value = audioInputs;
-      this.audioOutputs.value = audioOutputs;
-      this.videoInputs.value = videoInputs;
-      this.selectedAudioInput.value = selectedAudioInput;
-      this.selectedAudioOutput.value = selectedAudioOutput;
-      this.selectedVideoInput.value = selectedVideoInput;
-    } catch (e) {
-      appPrint(e);
-    }
-  }
-
-  // Peer
-  void addPeer(Map<String, dynamic> newPeer) {
-    final Peer temp = Peer.fromMap(newPeer);
-    peers[temp.id] = temp;
-    peers.refresh();
-  }
-
-  void removePeer(String peerId) {
-    peers.remove(peerId);
-  }
-
-  void addConsummer({required Consumer consumer, String? peerId}) async {
-    if (kIsWeb) {
-      if (peers[peerId]!.renderer == null) {
-        peers[peerId!] = peers[peerId]!.copyWith(renderer: RTCVideoRenderer());
-        await peers[peerId]!.renderer!.initialize();
-        // newPeers[event.peerId]!.renderer!.audioOutput = selectedOutputId;
-      }
-
-      if (consumer.kind == 'video') {
-        peers[peerId!] = peers[peerId]!.copyWith(video: consumer);
-        peers[peerId]!.renderer!.srcObject = peers[peerId]!.video!.stream;
-      }
-
-      if (consumer.kind == 'audio') {
-        peers[peerId!] = peers[peerId]!.copyWith(audio: consumer);
-        if (peers[peerId]!.video == null) {
-          peers[peerId]!.renderer!.srcObject = peers[peerId]!.audio!.stream;
-        }
-      }
-    } else {
-      if (consumer.kind == 'video') {
-        peers[peerId!] = peers[peerId]!.copyWith(
-          renderer: RTCVideoRenderer(),
-          video: consumer,
-        );
-        await peers[peerId]!.renderer!.initialize();
-        // newPeers[event.peerId]!.renderer!.audioOutput = selectedOutputId;
-        peers[peerId]!.renderer!.srcObject = peers[peerId]!.video!.stream;
-      } else {
-        peers[peerId!] = peers[peerId]!.copyWith(
-          audio: consumer,
-        );
-      }
-    }
-    peers.refresh();
-  }
-
-  void removeConsummer(String consumerId) async {
-    final Peer? peer = peers.values.firstWhereOrNull((p) => p.consumers.contains(consumerId));
-
-    if (peer != null) {
-      if (kIsWeb) {
-        if (peer.audio?.id == consumerId) {
-          final consumer = peer.audio;
-          if (peer.video == null) {
-            final renderer = peers[peer.id]?.renderer!;
-            peers[peer.id] = peers[peer.id]!.removeAudioAndRenderer();
-            await Future.delayed(const Duration(microseconds: 300));
-            await renderer?.dispose();
-          } else {
-            peers[peer.id] = peers[peer.id]!.removeAudio();
-          }
-          await consumer?.close();
-        } else if (peer.video?.id == consumerId) {
-          final consumer = peer.video;
-          if (peer.audio != null) {
-            peers[peer.id]!.renderer!.srcObject = peers[peer.id]!.audio!.stream;
-            peers[peer.id] = peers[peer.id]!.removeVideo();
-          } else {
-            final renderer = peers[peer.id]!.renderer!;
-            peers[peer.id] = peers[peer.id]!.removeVideoAndRenderer();
-            await renderer.dispose();
-          }
-          await consumer?.close();
-        }
-      } else {
-        if (peer.audio?.id == consumerId) {
-          final consumer = peer.audio;
-          peers[peer.id] = peers[peer.id]!.removeAudio();
-          await consumer?.close();
-        } else if (peer.video?.id == consumerId) {
-          final consumer = peer.video;
-          final renderer = peer.renderer;
-          peers[peer.id] = peers[peer.id]!.removeVideoAndRenderer();
-          consumer
-              ?.close()
-              .then((_) => Future.delayed(const Duration(microseconds: 300)))
-              .then((_) async => await renderer?.dispose());
-        }
-      }
-    }
-    peers.refresh();
-  }
-
-  void pauseConsummer(String consumerId) {
-    final Peer? peer = peers.values.firstWhereOrNull((p) => p.consumers.contains(consumerId));
-
-    if (peer != null) {
-      peers[peer.id] = peers[peer.id]!.copyWith(
-        audio: peer.audio!.pauseCopy(),
-      );
-    }
-    peers.refresh();
-  }
-
-  void resumeConsummer(String consumerId) {
-    final Peer? peer = peers.values.firstWhereOrNull((p) => p.consumers.contains(consumerId));
-
-    if (peer != null) {
-      peers[peer.id] = peers[peer.id]!.copyWith(
-        audio: peer.audio!.resumeCopy(),
-      );
-    }
-    peers.refresh();
-  }
-
-  // producer
-  void removeMic() {
-    mic.value?.close();
-    mic.value = null;
-  }
-
-  void removeWebcame() {
-    webcam.value?.close();
-    webcam.value = null;
-  }
-
-  void removeScreen() {
-    screen.value?.close();
-    screen.value = null;
-  }
-
-  void pauseMic() {
-    mic.value?.pauseCopy();
-  }
-
-  void pauseWebcame() {
-    webcam.value?.pauseCopy();
-  }
-
-  void pauseScreen() {
-    screen.value?.pauseCopy();
-  }
-
-  void resumeMic() {
-    mic.value?.resumeCopy();
-  }
-
-  void resumeWebcame() {
-    webcam.value?.resumeCopy();
-  }
-
-  void resumeScreen() {
-    screen.value?.resumeCopy();
-  }
-
-  void updateProducer(Producer newProducer) {
-    switch (newProducer.source) {
-      case 'mic':
-        mic.value = newProducer;
-      case 'webcam':
-        webcam.value = newProducer;
-      case 'screen':
-        screen.value = newProducer;
-      default:
-        break;
-    }
-  }
-
-  // Room
-  void _initRoom() {
-    final arg = Get.arguments;
-    final id = arg != null && arg.isNotEmpty ? arg : randomNumeric(6).toLowerCase();
-    rxUrl.value = 'https://v3demo.mediasoup.org/?roomId=$id';
-  }
-
-  void initRepo() {
-    url = rxUrl.value;
-
-    Uri? uri = Uri.parse(url);
-
-    peerId = rxId.value;
-    displayName = rxDisplayName.value;
-    url = url.isEmpty ? 'wss://${uri.host}:4443' : 'wss://v3demo.mediasoup.org:4443';
-    roomId = uri.queryParameters['roomId'] ?? uri.queryParameters['roomid'] ?? randomAlpha(8).toLowerCase();
-
+  void _setup() {
     join();
-    _audioInputSubscription = selectedAudioInput.stream.listen((MediaDeviceInfo? audioInput) async {
-      if (audioInput != null && audioInput.deviceId != audioInputDeviceId) {
+    _deviceController.selectedAudioInput.stream.listen((MediaDeviceInfo? audioInput) async {
+      if (audioInput != null && audioInput.deviceId != _deviceController.audioInputDeviceId) {
         await disableMic();
         enableMic();
       }
     });
-    _videoInputSubscription = selectedAudioInput.stream.listen((MediaDeviceInfo? videoInput) async {
-      if (videoInput != null && videoInput.deviceId != videoInputDeviceId) {
+    _deviceController.selectedAudioInput.stream.listen((MediaDeviceInfo? videoInput) async {
+      if (videoInput != null && videoInput.deviceId != _deviceController.videoInputDeviceId) {
         await disableWebcam();
         enableWebcam();
       }
     });
-  }
-
-  void setActiveSpeakerId(String? speakerId) {
-    activeSpeakerId.value = speakerId;
   }
 
   void close() {
@@ -355,71 +80,75 @@ class CallingController extends GetxController {
     _webSocket?.close();
     _sendTransport?.close();
     _recvTransport?.close();
-    _audioInputSubscription?.cancel();
-    _videoInputSubscription?.cancel();
   }
 
   Future<void> disableMic() async {
-    if (mic.value == null) {
+    if (_producerController.mic.value == null) {
       return;
     }
-    String micId = mic.value!.id;
+    String micId = _producerController.mic.value!.id;
 
-    removeMic();
+    _producerController.removeMic();
 
     try {
       await _webSocket!.socket.request('closeProducer', {
         'producerId': micId,
       });
-    } catch (error) {}
+    } catch (error) {
+      appPrint(error);
+    }
   }
 
   Future<void> disableWebcam() async {
-    if (webcam.value == null) {
+    if (_producerController.webcam.value == null) {
       return;
     }
-    setWebcamInProgress(progress: true);
-    String webcamId = webcam.value!.id;
+    webcamInProgress.value = true;
+    String webcamId = _producerController.webcam.value!.id;
 
-    removeWebcame();
+    _producerController.removeWebcame();
 
     try {
       await _webSocket!.socket.request('closeProducer', {
         'producerId': webcamId,
       });
     } finally {
-      setWebcamInProgress(progress: false);
+      webcamInProgress.value = false;
     }
   }
 
   Future<void> muteMic() async {
-    pauseMic();
+    _producerController.pauseMic();
 
     try {
       await _webSocket!.socket.request('pauseProducer', {
-        'producerId': mic.value!.id,
+        'producerId': _producerController.mic.value!.id,
       });
-    } catch (error) {}
+    } catch (error) {
+      appPrint(error);
+    }
   }
 
   Future<void> unmuteMic() async {
-    resumeMic();
+    _producerController.resumeMic();
 
     try {
       await _webSocket!.socket.request('resumeProducer', {
-        'producerId': mic.value!.id,
+        'producerId': _producerController.mic.value!.id,
       });
-    } catch (error) {}
+    } catch (error) {
+      appPrint(error);
+    }
   }
 
   void _producerCallback(Producer producer) {
     if (producer.source == 'webcam') {
-      setWebcamInProgress(progress: false);
+      webcamInProgress.value = false;
     }
     producer.on('trackended', () {
       disableMic().catchError((data) {});
     });
-    updateProducer(producer);
+    _producerController.updateProducer(producer);
   }
 
   void _consumerCallback(Consumer consumer, [dynamic accept]) {
@@ -427,16 +156,16 @@ class CallingController extends GetxController {
 
     accept({});
 
-    addConsummer(peerId: consumer.peerId, consumer: consumer);
+    _peerController.addConsummer(peerId: consumer.peerId, consumer: consumer);
   }
 
   Future<MediaStream> createAudioStream() async {
-    audioInputDeviceId = selectedAudioInput.value?.deviceId;
+    _deviceController.audioInputDeviceId = _deviceController.selectedAudioInput.value?.deviceId;
     Map<String, dynamic> mediaConstraints = {
       'audio': {
         'optional': [
           {
-            'sourceId': audioInputDeviceId,
+            'sourceId': _deviceController.audioInputDeviceId,
           },
         ],
       },
@@ -448,18 +177,18 @@ class CallingController extends GetxController {
   }
 
   Future<MediaStream> createVideoStream() async {
-    videoInputDeviceId = selectedVideoInput.value?.deviceId;
+    _deviceController.videoInputDeviceId = _deviceController.selectedVideoInput.value?.deviceId;
     Map<String, dynamic> mediaConstraints = <String, dynamic>{
       'audio': false,
       'video': {
         'mandatory': {
-          'minWidth': '1280', // Provide your own width, height and frame rate here
+          'minWidth': '1280',
           'minHeight': '720',
           'minFrameRate': '30',
         },
         'optional': [
           {
-            'sourceId': videoInputDeviceId,
+            'sourceId': _deviceController.videoInputDeviceId,
           },
         ],
       },
@@ -474,7 +203,7 @@ class CallingController extends GetxController {
     if (webcamInProgress.isTrue) {
       return;
     }
-    setWebcamInProgress(progress: true);
+    webcamInProgress.value = true;
     if (_mediasoupDevice!.canProduce(RTCRtpMediaType.RTCRtpMediaTypeVideo) == false) {
       return;
     }
@@ -488,7 +217,7 @@ class CallingController extends GetxController {
           orElse: () => throw 'desired vp$videoVPVersion codec+configuration is not supported');
       videoStream = await createVideoStream();
       track = videoStream.getVideoTracks().first;
-      setWebcamInProgress(progress: true);
+      webcamInProgress.value = true;
       _sendTransport!.produce(
         track: track,
         codecOptions: ProducerCodecOptions(
@@ -648,7 +377,7 @@ class CallingController extends GetxController {
       }
 
       Map response = await _webSocket!.socket.request('join', {
-        'displayName': displayName,
+        'displayName': _callInfoController.me.name,
         'device': {
           'name': "Flutter",
           'flag': 'flutter',
@@ -659,7 +388,7 @@ class CallingController extends GetxController {
       });
 
       response['peers'].forEach((value) {
-        addPeer(value);
+        _peerController.addPeer(value);
       });
 
       if (_produce) {
@@ -680,13 +409,10 @@ class CallingController extends GetxController {
   }
 
   void join() {
-    print('truong ${peerId}');
-    print('truong ${roomId}');
-    print('truong ${url}');
     _webSocket = WebSocket(
-      peerId: peerId,
-      roomId: roomId,
-      url: url,
+      peerId: _callInfoController.peerId,
+      roomId: _callInfoController.roomId,
+      url: _callInfoController.socket,
     );
 
     _webSocket!.onOpen = _joinRoom;
@@ -747,35 +473,35 @@ class CallingController extends GetxController {
         case 'consumerClosed':
           {
             String consumerId = notification['data']['consumerId'];
-            removeConsummer(consumerId);
+            _peerController.removeConsummer(consumerId);
 
             break;
           }
         case 'consumerPaused':
           {
             String consumerId = notification['data']['consumerId'];
-            pauseConsummer(consumerId);
+            _peerController.pauseConsummer(consumerId);
             break;
           }
 
         case 'consumerResumed':
           {
             String consumerId = notification['data']['consumerId'];
-            resumeConsummer(consumerId);
+            _peerController.resumeConsummer(consumerId);
             break;
           }
 
         case 'newPeer':
           {
             final Map<String, dynamic> newPeer = Map<String, dynamic>.from(notification['data']);
-            addPeer(newPeer);
+            _peerController.addPeer(newPeer);
             break;
           }
 
         case 'peerClosed':
           {
             String peerId = notification['data']['peerId'];
-            removePeer(peerId);
+            _peerController.removePeer(peerId);
             break;
           }
 

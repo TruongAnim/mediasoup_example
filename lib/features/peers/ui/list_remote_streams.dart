@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:mediasoup_update/core/mediasoup/peer_controller.dart';
 import 'package:mediasoup_update/features/peers/ui/remote_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:mediasoup_update/features/peers/enitity/peer.dart';
@@ -11,7 +12,7 @@ class ListRemoteStreams extends GetView<CallingController> {
   Widget build(BuildContext context) {
     return Obx(
       () {
-        final Map<String, Peer> peers = controller.peers;
+        final Map<String, Peer> peers = Get.find<PeerController>().peers;
 
         final bool small = MediaQuery.of(context).size.width < 800;
         final bool horizontal = MediaQuery.of(context).orientation == Orientation.landscape;

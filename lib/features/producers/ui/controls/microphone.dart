@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mediasoup_update/core/mediasoup/calling_controller.dart';
 import 'package:mediasoup_client_flutter/mediasoup_client_flutter.dart';
+import 'package:mediasoup_update/core/mediasoup/device_controller.dart';
+import 'package:mediasoup_update/core/mediasoup/producer_controller.dart';
 
 class Microphone extends GetView<CallingController> {
   const Microphone({Key? key}) : super(key: key);
@@ -10,8 +12,8 @@ class Microphone extends GetView<CallingController> {
   Widget build(BuildContext context) {
     return Obx(
       () {
-        final Producer? microphone = controller.mic.value;
-        final int audioInputDevicesLength = controller.audioInputs.length;
+        final Producer? microphone = Get.find<ProducerController>().mic.value;
+        final int audioInputDevicesLength = Get.find<DeviceController>().audioInputs.length;
         if (audioInputDevicesLength == 0) {
           return IconButton(
             onPressed: () {},
@@ -37,9 +39,9 @@ class Microphone extends GetView<CallingController> {
           ),
           onPressed: () {
             if (microphone?.paused == true) {
-              Get.find<CallingController>().unmuteMic();
+              controller.unmuteMic();
             } else {
-              Get.find<CallingController>().muteMic();
+              controller.muteMic();
             }
           },
           child: Icon(

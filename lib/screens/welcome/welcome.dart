@@ -4,7 +4,6 @@ import 'package:mediasoup_update/features/media_devices/ui/audio_input_selector.
 import 'package:mediasoup_update/features/media_devices/ui/audio_output_selector.dart';
 import 'package:mediasoup_update/features/media_devices/ui/video_input_selector.dart';
 import 'package:flutter/material.dart';
-import 'package:mediasoup_update/core/mediasoup/calling_controller.dart';
 
 class Welcome extends StatefulWidget {
   const Welcome({Key? key}) : super(key: key);
@@ -118,9 +117,16 @@ class _WelcomeState extends State<Welcome> {
                 onPressed: () {
                   Get.toNamed(
                     BaseRouters.ROOM,
-                    arguments: url,
+                    arguments: {
+                      'url': 'wss://v3demo.mediasoup.org:4443',
+                      'peerId': 'abcdefgh',
+                      'roomId': '123456',
+                      'id': '123',
+                      'name': 'TruongAnim',
+                      'socket': 'wss://v3demo.mediasoup.org:4443',
+                      'roomUrl': 'https://v3demo.mediasoup.org/'
+                    },
                   );
-                  Get.find<CallingController>().initRepo();
                 },
                 style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.black)),
                 child: Text(url.isNotEmpty ? 'Join' : 'Join to Random Room'),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:mediasoup_update/core/mediasoup/call_info_controller.dart';
 import 'package:mediasoup_update/core/mediasoup/calling_controller.dart';
 
 class RoomAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -29,9 +30,9 @@ class RoomAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
             title: Builder(
               builder: (context) {
-                String url = Get.find<CallingController>().rxUrl.value;
+                String roomId = Get.find<CallInfoController>().roomId;
                 return Text(
-                  'Room id: ${Uri.parse(url).queryParameters['roomId'] ?? Uri.parse(url).queryParameters['roomid']}',
+                  'Room id: $roomId',
                   style: const TextStyle(
                     color: Colors.black,
                   ),
@@ -41,12 +42,12 @@ class RoomAppBar extends StatelessWidget implements PreferredSizeWidget {
             actions: [
               IconButton(
                 onPressed: () {
-                  String url = Get.find<CallingController>().rxUrl.value;
+                  String url = Get.find<CallInfoController>().getRoomUrl();
                   Clipboard.setData(ClipboardData(text: url));
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Room link copied to clipboard'),
-                      duration: Duration(seconds: 1),
+                    SnackBar(
+                      content: Text('Copied: $url'),
+                      duration: const Duration(seconds: 2),
                     ),
                   );
                 },

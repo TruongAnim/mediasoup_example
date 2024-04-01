@@ -1,7 +1,10 @@
+// ignore_for_file: constant_identifier_names
+
 import 'package:get/get.dart';
 import 'package:mediasoup_update/screens/room/room.dart';
 import 'package:mediasoup_update/screens/room/room_binding.dart';
 import 'package:mediasoup_update/screens/welcome/welcome.dart';
+import 'package:mediasoup_update/screens/welcome/welcome_binding.dart';
 
 mixin BaseRouters {
   static const String HOME = '/home';
@@ -11,6 +14,7 @@ mixin BaseRouters {
     GetPage(
       name: HOME,
       page: () => const Welcome(),
+      binding: WelcomeBinding(),
     ),
     GetPage(
       name: ROOM,
