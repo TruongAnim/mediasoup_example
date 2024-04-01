@@ -1,8 +1,6 @@
 import 'package:get/get.dart';
 import 'package:mediasoup_client_flutter/mediasoup_client_flutter.dart';
 import 'package:mediasoup_update/core/mediasoup/calling_controller.dart';
-import 'package:mediasoup_update/features/media_devices/media_device_controller.dart';
-import 'package:mediasoup_update/features/producers/producer_controller.dart';
 import 'package:mediasoup_update/features/producers/ui/renderer/dragger.dart';
 import 'package:flutter/material.dart';
 

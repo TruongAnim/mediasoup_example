@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mediasoup_update/core/mediasoup/calling_controller.dart';
-import 'package:mediasoup_update/features/room/room_controller.dart';
 import 'package:mediasoup_update/features/signaling/room_client_repo.dart';
 
 class RoomAppBar extends StatelessWidget implements PreferredSizeWidget {

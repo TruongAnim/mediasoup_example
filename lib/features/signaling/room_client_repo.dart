@@ -4,10 +4,6 @@ import 'dart:async';
 
 import 'package:get/get.dart' hide navigator;
 import 'package:mediasoup_update/core/mediasoup/calling_controller.dart';
-import 'package:mediasoup_update/features/me/me_controller.dart';
-import 'package:mediasoup_update/features/media_devices/media_device_controller.dart';
-import 'package:mediasoup_update/features/peers/peer_controller.dart';
-import 'package:mediasoup_update/features/producers/producer_controller.dart';
 import 'package:mediasoup_update/features/signaling/web_socket.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:mediasoup_client_flutter/mediasoup_client_flutter.dart';

@@ -4,8 +4,6 @@ import 'package:get/get.dart';
 import 'package:mediasoup_update/core/mediasoup/calling_controller.dart';
 import 'package:mediasoup_update/features/media_devices/ui/media_device_selector.dart';
 
-import '../media_device_controller.dart';
-
 class AudioInputSelector extends GetView<CallingController> {
   const AudioInputSelector({Key? key}) : super(key: key);
 
