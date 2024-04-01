@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
-import 'package:mediasoup_update/features/signaling/room_client_repo.dart';
+import 'package:mediasoup_update/core/mediasoup/calling_controller.dart';
 
 class Leave extends StatelessWidget {
   const Leave({Key? key}) : super(key: key);
@@ -22,7 +23,7 @@ class Leave extends StatelessWidget {
         }),
       ),
       onPressed: () {
-        GetIt.I.get<RoomClientRepo>().close();
+        Get.find<CallingController>().close();
         Navigator.pop(context);
       },
       child: const Icon(

@@ -1,8 +1,6 @@
 import 'package:get/get.dart';
-import 'package:get_it/get_it.dart';
-import 'package:mediasoup_update/core/mediasoup/calling_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:mediasoup_update/features/signaling/room_client_repo.dart';
+import 'package:mediasoup_update/core/mediasoup/calling_controller.dart';
 import 'package:mediasoup_client_flutter/mediasoup_client_flutter.dart';
 
 class Webcam extends GetView<CallingController> {
@@ -12,7 +10,7 @@ class Webcam extends GetView<CallingController> {
   Widget build(BuildContext context) {
     return Obx(
       () {
-        final RoomClientRepo roomClientRepo = GetIt.I.get<RoomClientRepo>();
+        final CallingController roomClientRepo = Get.find<CallingController>();
         final int videoInputDevicesLength = controller.videoInputs.length;
         final bool inProgress = controller.webcamInProgress.value;
         final Producer? webcam = controller.webcam.value;

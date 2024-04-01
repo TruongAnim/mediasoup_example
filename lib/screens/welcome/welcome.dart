@@ -1,11 +1,10 @@
 import 'package:get/get.dart';
 import 'package:mediasoup_update/config/routes/route_path/base_routers.dart';
-import 'package:mediasoup_update/core/app_controller.dart';
-import 'package:mediasoup_update/core/mediasoup/calling_controller.dart';
 import 'package:mediasoup_update/features/media_devices/ui/audio_input_selector.dart';
 import 'package:mediasoup_update/features/media_devices/ui/audio_output_selector.dart';
 import 'package:mediasoup_update/features/media_devices/ui/video_input_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:mediasoup_update/core/mediasoup/calling_controller.dart';
 
 class Welcome extends StatefulWidget {
   const Welcome({Key? key}) : super(key: key);
@@ -117,11 +116,11 @@ class _WelcomeState extends State<Welcome> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  Get.find<CallingController>().initRepo();
                   Get.toNamed(
                     BaseRouters.ROOM,
                     arguments: url,
                   );
+                  Get.find<CallingController>().initRepo();
                 },
                 style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.black)),
                 child: Text(url.isNotEmpty ? 'Join' : 'Join to Random Room'),

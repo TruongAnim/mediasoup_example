@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:get_it/get_it.dart';
 import 'package:mediasoup_update/core/mediasoup/calling_controller.dart';
-import 'package:mediasoup_update/features/signaling/room_client_repo.dart';
 
 class RoomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool display;
@@ -31,7 +29,7 @@ class RoomAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
             title: Builder(
               builder: (context) {
-                String url = Get.find<CallingController>().url.value;
+                String url = Get.find<CallingController>().rxUrl.value;
                 return Text(
                   'Room id: ${Uri.parse(url).queryParameters['roomId'] ?? Uri.parse(url).queryParameters['roomid']}',
                   style: const TextStyle(
@@ -43,7 +41,7 @@ class RoomAppBar extends StatelessWidget implements PreferredSizeWidget {
             actions: [
               IconButton(
                 onPressed: () {
-                  String url = Get.find<CallingController>().url.value;
+                  String url = Get.find<CallingController>().rxUrl.value;
                   Clipboard.setData(ClipboardData(text: url));
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -64,7 +62,7 @@ class RoomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 color: Colors.black,
               ),
               onPressed: () {
-                GetIt.I.get<RoomClientRepo>().close();
+                Get.find<CallingController>().close();
                 Navigator.pop(context);
               },
             ),
