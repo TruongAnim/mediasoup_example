@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:mediasoup_update/core/mediasoup/calling_controller.dart';
 import 'package:mediasoup_update/features/media_devices/media_device_controller.dart';
 import 'package:mediasoup_update/features/producers/producer_controller.dart';
 import 'package:mediasoup_update/features/signaling/room_client_repo.dart';
 import 'package:mediasoup_client_flutter/mediasoup_client_flutter.dart';
 
-class Microphone extends GetView<ProducerController> {
+class Microphone extends GetView<CallingController> {
   const Microphone({Key? key}) : super(key: key);
 
   @override
@@ -14,7 +15,7 @@ class Microphone extends GetView<ProducerController> {
     return Obx(
       () {
         final Producer? microphone = controller.mic.value;
-        final int audioInputDevicesLength = Get.find<MediaDeviceController>().audioInputs.length;
+        final int audioInputDevicesLength = controller.audioInputs.length;
         if (audioInputDevicesLength == 0) {
           return IconButton(
             onPressed: () {},

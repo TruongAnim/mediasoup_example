@@ -3,6 +3,7 @@
 import 'dart:async';
 
 import 'package:get/get.dart' hide navigator;
+import 'package:mediasoup_update/core/mediasoup/calling_controller.dart';
 import 'package:mediasoup_update/features/me/me_controller.dart';
 import 'package:mediasoup_update/features/media_devices/media_device_controller.dart';
 import 'package:mediasoup_update/features/peers/peer_controller.dart';
@@ -13,10 +14,7 @@ import 'package:mediasoup_client_flutter/mediasoup_client_flutter.dart';
 import 'package:mediasoup_update/helper.dart';
 
 class RoomClientRepo {
-  final ProducerController _producerController = Get.find<ProducerController>();
-  final MediaDeviceController _mediaDeviceController = Get.find<MediaDeviceController>();
-  final PeerController _peerController = Get.find<PeerController>();
-  final MeController _meController = Get.find<MeController>();
+  final CallingController _callingController = Get.find<CallingController>();
 
   final String roomId;
   final String peerId;
@@ -43,15 +41,13 @@ class RoomClientRepo {
     required this.url,
     required this.displayName,
   }) {
-    _audioInputSubscription =
-        _mediaDeviceController.selectedAudioInput.stream.listen((MediaDeviceInfo? audioInput) async {
+    _audioInputSubscription = _callingController.selectedAudioInput.stream.listen((MediaDeviceInfo? audioInput) async {
       if (audioInput != null && audioInput.deviceId != audioInputDeviceId) {
         await disableMic();
         enableMic();
       }
     });
-    _videoInputSubscription =
-        _mediaDeviceController.selectedAudioInput.stream.listen((MediaDeviceInfo? videoInput) async {
+    _videoInputSubscription = _callingController.selectedAudioInput.stream.listen((MediaDeviceInfo? videoInput) async {
       if (videoInput != null && videoInput.deviceId != videoInputDeviceId) {
         await disableWebcam();
         enableWebcam();
@@ -72,8 +68,8 @@ class RoomClientRepo {
   }
 
   Future<void> disableMic() async {
-    String micId = _producerController.mic.value!.id;
-    _producerController.removeMic();
+    String micId = _callingController.mic.value!.id;
+    _callingController.removeMic();
 
     try {
       await _webSocket!.socket.request('closeProducer', {
@@ -83,47 +79,47 @@ class RoomClientRepo {
   }
 
   Future<void> disableWebcam() async {
-    _meController.setWebcamInProgress(progress: true);
-    String webcamId = _producerController.webcam.value!.id;
-    _producerController.removeWebcame();
+    _callingController.setWebcamInProgress(progress: true);
+    String webcamId = _callingController.webcam.value!.id;
+    _callingController.removeWebcame();
 
     try {
       await _webSocket!.socket.request('closeProducer', {
         'producerId': webcamId,
       });
     } finally {
-      _meController.setWebcamInProgress(progress: false);
+      _callingController.setWebcamInProgress(progress: false);
     }
   }
 
   Future<void> muteMic() async {
-    _producerController.pauseMic();
+    _callingController.pauseMic();
 
     try {
       await _webSocket!.socket.request('pauseProducer', {
-        'producerId': _producerController.mic.value!.id,
+        'producerId': _callingController.mic.value!.id,
       });
     } catch (error) {}
   }
 
   Future<void> unmuteMic() async {
-    _producerController.resumeMic();
+    _callingController.resumeMic();
 
     try {
       await _webSocket!.socket.request('resumeProducer', {
-        'producerId': _producerController.mic.value!.id,
+        'producerId': _callingController.mic.value!.id,
       });
     } catch (error) {}
   }
 
   void _producerCallback(Producer producer) {
     if (producer.source == 'webcam') {
-      _meController.setWebcamInProgress(progress: false);
+      _callingController.setWebcamInProgress(progress: false);
     }
     producer.on('trackended', () {
       disableMic().catchError((data) {});
     });
-    _producerController.updateProducer(producer);
+    _callingController.updateProducer(producer);
   }
 
   void _consumerCallback(Consumer consumer, [dynamic accept]) {
@@ -131,11 +127,11 @@ class RoomClientRepo {
 
     accept({});
 
-    _peerController.addConsummer(peerId: consumer.peerId, consumer: consumer);
+    _callingController.addConsummer(peerId: consumer.peerId, consumer: consumer);
   }
 
   Future<MediaStream> createAudioStream() async {
-    audioInputDeviceId = _mediaDeviceController.selectedAudioInput.value?.deviceId;
+    audioInputDeviceId = _callingController.selectedAudioInput.value?.deviceId;
     Map<String, dynamic> mediaConstraints = {
       'audio': {
         'optional': [
@@ -152,7 +148,7 @@ class RoomClientRepo {
   }
 
   Future<MediaStream> createVideoStream() async {
-    videoInputDeviceId = _mediaDeviceController.selectedVideoInput.value?.deviceId;
+    videoInputDeviceId = _callingController.selectedVideoInput.value?.deviceId;
     Map<String, dynamic> mediaConstraints = <String, dynamic>{
       'audio': false,
       'video': {
@@ -175,10 +171,10 @@ class RoomClientRepo {
   }
 
   void enableWebcam() async {
-    if (_meController.webcamInProgress.isTrue) {
+    if (_callingController.webcamInProgress.isTrue) {
       return;
     }
-    _meController.setWebcamInProgress(progress: true);
+    _callingController.setWebcamInProgress(progress: true);
     if (_mediasoupDevice!.canProduce(RTCRtpMediaType.RTCRtpMediaTypeVideo) == false) {
       return;
     }
@@ -192,7 +188,7 @@ class RoomClientRepo {
           orElse: () => throw 'desired vp$videoVPVersion codec+configuration is not supported');
       videoStream = await createVideoStream();
       track = videoStream.getVideoTracks().first;
-      _meController.setWebcamInProgress(progress: true);
+      _callingController.setWebcamInProgress(progress: true);
       _sendTransport!.produce(
         track: track,
         codecOptions: ProducerCodecOptions(
@@ -363,7 +359,7 @@ class RoomClientRepo {
       });
 
       response['peers'].forEach((value) {
-        _peerController.addPeer(value);
+        _callingController.addPeer(value);
       });
 
       if (_produce) {
@@ -448,35 +444,35 @@ class RoomClientRepo {
         case 'consumerClosed':
           {
             String consumerId = notification['data']['consumerId'];
-            _peerController.removeConsummer(consumerId);
+            _callingController.removeConsummer(consumerId);
 
             break;
           }
         case 'consumerPaused':
           {
             String consumerId = notification['data']['consumerId'];
-            _peerController.pauseConsummer(consumerId);
+            _callingController.pauseConsummer(consumerId);
             break;
           }
 
         case 'consumerResumed':
           {
             String consumerId = notification['data']['consumerId'];
-            _peerController.resumeConsummer(consumerId);
+            _callingController.resumeConsummer(consumerId);
             break;
           }
 
         case 'newPeer':
           {
             final Map<String, dynamic> newPeer = Map<String, dynamic>.from(notification['data']);
-            _peerController.addPeer(newPeer);
+            _callingController.addPeer(newPeer);
             break;
           }
 
         case 'peerClosed':
           {
             String peerId = notification['data']['peerId'];
-            _peerController.removePeer(peerId);
+            _callingController.removePeer(peerId);
             break;
           }
 

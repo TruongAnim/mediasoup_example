@@ -3,7 +3,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:get/get.dart';
 import 'package:mediasoup_update/helper.dart';
 
-class MediaDeviceController extends GetxController {
+class _MediaDeviceController extends GetxController {
   final RTCVideoRenderer renderer = RTCVideoRenderer();
   final RxList<MediaDeviceInfo> audioInputs = RxList();
   final RxList<MediaDeviceInfo> audioOutputs = RxList();

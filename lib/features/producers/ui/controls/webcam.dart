@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
+import 'package:mediasoup_update/core/mediasoup/calling_controller.dart';
 import 'package:mediasoup_update/features/me/me_controller.dart';
 import 'package:mediasoup_update/features/media_devices/media_device_controller.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +8,7 @@ import 'package:mediasoup_update/features/producers/producer_controller.dart';
 import 'package:mediasoup_update/features/signaling/room_client_repo.dart';
 import 'package:mediasoup_client_flutter/mediasoup_client_flutter.dart';
 
-class Webcam extends GetView<ProducerController> {
+class Webcam extends GetView<CallingController> {
   const Webcam({Key? key}) : super(key: key);
 
   @override
@@ -15,8 +16,8 @@ class Webcam extends GetView<ProducerController> {
     return Obx(
       () {
         final RoomClientRepo roomClientRepo = GetIt.I.get<RoomClientRepo>();
-        final int videoInputDevicesLength = Get.find<MediaDeviceController>().videoInputs.length;
-        final bool inProgress = Get.find<MeController>().webcamInProgress.value;
+        final int videoInputDevicesLength = controller.videoInputs.length;
+        final bool inProgress = controller.webcamInProgress.value;
         final Producer? webcam = controller.webcam.value;
         if (videoInputDevicesLength == 0) {
           return IconButton(

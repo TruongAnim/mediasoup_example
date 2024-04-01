@@ -5,7 +5,7 @@ import 'package:mediasoup_client_flutter/mediasoup_client_flutter.dart';
 
 import 'enitity/peer.dart';
 
-class PeerController {
+class _PeerController {
   RxString selectedOutputId = RxString('');
   RxMap<String, Peer> peers = RxMap<String, Peer>({});
 

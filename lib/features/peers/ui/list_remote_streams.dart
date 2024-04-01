@@ -1,10 +1,11 @@
 import 'package:get/get.dart';
+import 'package:mediasoup_update/core/mediasoup/calling_controller.dart';
 import 'package:mediasoup_update/features/peers/peer_controller.dart';
 import 'package:mediasoup_update/features/peers/ui/remote_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:mediasoup_update/features/peers/enitity/peer.dart';
 
-class ListRemoteStreams extends GetView<PeerController> {
+class ListRemoteStreams extends GetView<CallingController> {
   const ListRemoteStreams({Key? key}) : super(key: key);
 
   @override

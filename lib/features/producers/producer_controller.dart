@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:mediasoup_client_flutter/mediasoup_client_flutter.dart';
 
-class ProducerController extends GetxController {
+class _ProducerController extends GetxController {
   Rxn<Producer> mic = Rxn();
   Rxn<Producer> webcam = Rxn();
   Rxn<Producer> screen = Rxn();

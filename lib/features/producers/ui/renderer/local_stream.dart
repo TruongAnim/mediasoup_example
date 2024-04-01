@@ -1,11 +1,12 @@
 import 'package:get/get.dart';
 import 'package:mediasoup_client_flutter/mediasoup_client_flutter.dart';
+import 'package:mediasoup_update/core/mediasoup/calling_controller.dart';
 import 'package:mediasoup_update/features/media_devices/media_device_controller.dart';
 import 'package:mediasoup_update/features/producers/producer_controller.dart';
 import 'package:mediasoup_update/features/producers/ui/renderer/dragger.dart';
 import 'package:flutter/material.dart';
 
-class LocalStream extends GetView<MediaDeviceController> {
+class LocalStream extends GetView<CallingController> {
   const LocalStream({Key? key}) : super(key: key);
   final double streamContainerSize = 180;
 
@@ -14,7 +15,7 @@ class LocalStream extends GetView<MediaDeviceController> {
     return Obx(
       () {
         final MediaDeviceInfo? selectedVideoInput = controller.selectedVideoInput.value;
-        final Producer? webcam = Get.find<ProducerController>().webcam.value;
+        final Producer? webcam = controller.webcam.value;
         if (controller.renderer.srcObject != webcam?.stream) {
           controller.renderer.srcObject = webcam?.stream;
         }

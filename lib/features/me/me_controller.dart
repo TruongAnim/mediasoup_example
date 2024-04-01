@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:mediasoup_update/utils.dart';
 import 'package:random_string/random_string.dart';
 
-class MeController extends GetxController {
+class _MeController extends GetxController {
   RxString displayName = RxString('');
   RxString id = RxString('');
   RxBool shareInProgress = RxBool(false);
