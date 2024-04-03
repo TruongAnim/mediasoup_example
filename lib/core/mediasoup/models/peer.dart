@@ -1,5 +1,6 @@
-import 'package:mediasoup_update/features/peers/enitity/peer_device.dart';
 import 'package:mediasoup_client_flutter/mediasoup_client_flutter.dart';
+
+import 'peer_device.dart';
 
 class Peer {
   final Consumer? audio;

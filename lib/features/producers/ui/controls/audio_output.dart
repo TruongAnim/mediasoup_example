@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:mediasoup_update/core/mediasoup/calling_controller.dart';
 import 'package:mediasoup_update/core/mediasoup/device_controller.dart';
 
 class AudioOutput extends GetView<DeviceController> {
@@ -26,6 +29,8 @@ class AudioOutput extends GetView<DeviceController> {
         }),
       ),
       onPressed: () {
+        Get.find<CallingController>().sendData("truong hello ${Random.secure().nextInt(100)}");
+
         return;
         // int index = audioOutputs.indexWhere((ao) => ao.deviceId == selectedAudioOutput?.deviceId);
         // if (index != -1) {

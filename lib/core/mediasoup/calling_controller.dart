@@ -1,7 +1,8 @@
 import 'dart:async';
 
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart' hide navigator;
-import 'package:mediasoup_update/features/signaling/web_socket.dart';
+import 'package:mediasoup_update/core/mediasoup/signaling/web_socket.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:mediasoup_client_flutter/mediasoup_client_flutter.dart';
 import 'package:mediasoup_update/helper.dart';
@@ -21,9 +22,13 @@ class CallingController extends GetxController {
   WebSocket? _webSocket;
   Transport? _sendTransport;
   Transport? _recvTransport;
+  DataProducer? _dataProducer;
+  final _dataConsumerController = StreamController<String>.broadcast();
+  Stream<String> get dataConsumerStream => _dataConsumerController.stream;
   bool _produce = false;
   final bool _closed = false;
   final bool _consume = true;
+  final bool _showToast = true;
 
   // Is loading webcam
   RxBool webcamInProgress = RxBool(false);
@@ -42,6 +47,7 @@ class CallingController extends GetxController {
   @override
   void onClose() {
     super.onClose();
+    _dataConsumerController.close();
     close();
   }
 
@@ -268,6 +274,21 @@ class CallingController extends GetxController {
     }
   }
 
+  void initProduceData(String label, Map<String, dynamic> appData) {
+    _sendTransport!.produceData(maxRetransmits: 3, label: label, priority: Priority.High, appData: appData);
+  }
+
+  bool sendData(dynamic data) {
+    if (_dataProducer == null) {
+      return false;
+    }
+    if (_showToast) {
+      Fluttertoast.showToast(msg: "Send data: $data");
+    }
+    _dataProducer!.send(data);
+    return true;
+  }
+
   Future<void> _joinRoom() async {
     try {
       _mediasoupDevice = Device();
@@ -296,9 +317,16 @@ class CallingController extends GetxController {
         _sendTransport = _mediasoupDevice!.createSendTransportFromMap(
           transportInfo,
           producerCallback: _producerCallback,
+          dataProducerCallback: (DataProducer producer) {
+            if (_showToast) {
+              Fluttertoast.showToast(msg: "Init data producer done");
+            }
+            _dataProducer = producer;
+          },
         );
 
         _sendTransport!.on('connect', (Map data) {
+          initProduceData('chat', {'info': 'my-chat-DataProducer'});
           _webSocket!.socket
               .request('connectWebRtcTransport', {
                 'transportId': _sendTransport!.id,
@@ -357,6 +385,17 @@ class CallingController extends GetxController {
         _recvTransport = _mediasoupDevice!.createRecvTransportFromMap(
           transportInfo,
           consumerCallback: _consumerCallback,
+          dataConsumerCallback: (DataConsumer comsumer, accept) {
+            if (_showToast) {
+              Fluttertoast.showToast(msg: "Init data comumer done");
+            }
+            comsumer.dataChannel.messageStream.listen((event) {
+              _dataConsumerController.sink.add(event.text);
+              if (_showToast) {
+                Fluttertoast.showToast(msg: "Receive data: ${event.text}");
+              }
+            });
+          },
         );
 
         _recvTransport!.on(
@@ -458,6 +497,17 @@ class CallingController extends GetxController {
               rethrow;
             }
             break;
+          }
+        case 'newDataConsumer':
+          {
+            _recvTransport!.consumeData(
+              id: request['data']['id'],
+              dataProducerId: request['data']['dataProducerId'],
+              sctpStreamParameters: SctpStreamParameters(streamId: request['data']['sctpStreamParameters']['streamId']),
+              appData: request['data']['appData'],
+              label: request['data']['label'],
+              accept: () {},
+            );
           }
         default:
           break;

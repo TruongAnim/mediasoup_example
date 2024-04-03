@@ -2,7 +2,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:mediasoup_client_flutter/mediasoup_client_flutter.dart';
-import 'package:mediasoup_update/features/peers/enitity/peer.dart';
+
+import 'models/peer.dart';
 
 class PeerController extends GetxController {
   // Peer
